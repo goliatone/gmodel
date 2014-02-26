@@ -14,7 +14,6 @@ files = [
     REQUIRE_ADAPTER,
 
     {pattern: 'lib/requirejs/require.js', included: false},
-    {pattern: 'lib/jquery/jquery.js', included: false},
     {pattern: 'src/*.js', included: false},
     {pattern: 'test/spec/*-spec.js', included: false},
 
