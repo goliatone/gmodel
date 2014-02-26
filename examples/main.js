@@ -2,12 +2,11 @@
 /* jshint strict: false */
 requirejs.config({
     paths: {
-        'jquery': '../lib/jquery/jquery',
-        'gmodel': '../src/gmodel'
+        'gmodel': 'gmodel'
     }
 });
 
-define(['gmodel', 'jquery'], function (Gmodel, $) {
+define(['gmodel'], function (Gmodel) {
     console.log('Loading');
 	var gmodel = new Gmodel();
 	gmodel.init();
