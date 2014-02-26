@@ -1,0 +1,30 @@
+{
+  "name": "gmodel",
+  "version": "0.1.0",
+  "description": "Tiny model module.",
+  "homepage": "https://github.com/goliatone/gmodel",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/goliatone/gmodel.git.git"
+	},
+	 "bugs": {
+		"url": "https://github.com/goliatone/gmodel.git/issues"
+	},
+	"author": {
+		"name": "goliatone",
+		"email": "hello@goliatone.com",
+		"url": "http://goliatone.com"
+	},
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "git://github.com/goliatone/gmodel.git/blob/master/LICENSE-MIT"
+		}
+	],
+  "dependencies": {
+    "jquery": "~1.9.1",
+    "requirejs": "~2.1.4"
+  },
+  "devDependencies": {
+  }
+}
