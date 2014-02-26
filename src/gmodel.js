@@ -98,10 +98,10 @@
      * @param  {object} config Configuration object.
      */
     var GModel = function(config){
-        _extend(options, config || {});
+        config = _extend(options, config || {});
 
         this.formatters = [];
-
+        console.log(config);
         this.init(config.data);
     };
 
@@ -120,15 +120,20 @@
 
     GModel.prototype.get = function(key, def){
         var value = this.attributes[key] || def,
-            formatter = this.formatter[key];
+            formatter = this.formatters[key];
         if(!formatter) return value;
-
+        //TODO: Should we enable multiple formatters?
         return formatter.fn.call(formatter.scope, value);
     };
 
     GModel.prototype.set = function(key, value){
         this.attributes[key] = value;
-        this.dirty[key] = value;
+        this.dirty[key] = value; //TODO: We can remove this...it should be sync.
+
+        return this;
+    };
+
+    GModel.prototype.alias = function(key, formatter){
 
         return this;
     };
