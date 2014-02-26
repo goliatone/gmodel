@@ -8,14 +8,14 @@
 /* jshint strict: false, plusplus: true */
 /*global define: false, require: false, module: false, exports: false */
 (function (root, name, deps, factory) {
-    "use strict";
+    'use strict';
     // Node
-     if(typeof deps === 'function') { 
+    if(typeof deps === 'function') {
         factory = deps;
         deps = [];
     }
         
-    if (typeof exports === 'object') {        
+    if (typeof exports === 'object') {
         module.exports = factory.apply(root, deps.map(require));
     } else if (typeof define === 'function' && 'amd' in define) {
         //require js, here we assume the file is named as the lower
@@ -32,7 +32,7 @@
             return mod;
         };
     }
-}(this, "Gmodel", function() {
+}(this, 'GModel', function() {
 
     /**
      * Extend method.
@@ -65,13 +65,13 @@
     var _proxy = function( fn, context ) {
         var tmp, args, proxy, slice = Array.prototype.slice;
 
-        if ( typeof context === "string" ) {
+        if ( typeof context === 'string' ) {
             tmp = fn[ context ];
             context = fn;
             fn = tmp;
         }
 
-        if ( ! typeof(fn) === 'function') return undefined;
+        if (typeof(fn) !== 'function') return undefined;
 
         args = slice.call(arguments, 2);
         proxy = function() {
@@ -91,22 +91,128 @@
     };
     
     /**
-     * Gmodel constructor
+     * GModel constructor
+     * TODO: Handle default values for model props.
+     * TODO: Schema?
      * 
      * @param  {object} config Configuration object.
      */
-    var Gmodel = function(config){
-        _extend(options, config || {});     
-        this.init();  
+    var GModel = function(config){
+        _extend(options, config || {});
+
+        this.formatters = [];
+
+        this.init(config.data);
     };
+
+
 
 ///////////////////////////////////////////////////
 // PRIVATE METHODS
 ///////////////////////////////////////////////////
 
-    Gmodel.prototype.init = function(){
-        console.log('Gmodel: Init!');
+    GModel.prototype.init = function(data){
+        console.log('GModel: Init!');
+        this.attributes = data || {};
+        this.dirty = {};
         return 'This is just a stub!';
     };
-    return Gmodel;
+
+    GModel.prototype.get = function(key, def){
+        var value = this.attributes[key] || def,
+            formatter = this.formatter[key];
+        if(!formatter) return value;
+
+        return formatter.fn.call(formatter.scope, value);
+    };
+
+    GModel.prototype.set = function(key, value){
+        this.attributes[key] = value;
+        this.dirty[key] = value;
+
+        return this;
+    };
+
+    GModel.prototype.has = function(key){
+        return this.attributes.hasOwnProperty(key);
+    };
+
+    GModel.prototype.del = function(key){
+        if(! this.has(key)) return this;
+        delete this.attributes[key];
+        delete this.dirty[key];
+        return this;
+    };
+
+    GModel.prototype.toJSON = function(){
+        return _extend({}, this.attributes);
+    };
+
+    GModel.prototype.fromJSON = function(data){
+        this.init(data);
+        return this;
+    };
+
+    GModel.prototype.changed = function(attributes){
+        if(typeof attributes === 'string') return !! this.dirty[attributes];
+
+        var ouput = {};
+        for(var attribute in this.dirty) ouput[attribute] = this.dirty[attribute];
+
+        return ouput;
+    };
+
+    GModel.prototype.walk = function(callback, scope) {
+        scope || (scope = this);
+
+        Object.keys(this.attributes).forEach(function(key){
+            callback.call(scope, this.attributes[key], this.attributes);
+        },this);
+
+        return this;
+    };
+
+
+    GModel.prototype.format = function(id, callback, scope) {
+        this.formatters[id] = {fn:callback, scope:(scope || this)};
+        return this;
+    };
+
+    GModel.prototype.use = function(plugin, scenario){
+        plugin(this, scenario);
+        return this;
+    };
+
+    //TODO: Handle virtual attributes.
+    GModel.prototype.compute = function(key, set, get){
+
+    };
+
+///////////////////////////////////////////////
+///////////////////////////////////////////////
+
+    GModel.prototype.validate = function(){
+        var fns = this.validators || [];
+        this.errors = [];
+        for(var i = 0, t = fns.length; i < t; ++i) fns[i](this);
+        
+        if(this.errors.length) this.emit('invalid');
+        else this.emit('valid');
+
+        return this;
+    };
+
+    //TODO: Move to plugin?
+    GModel.prototype.validator = function(validator){
+        this.validators || (this.validators = []);
+
+        this.validators.push(validator);
+        return this;
+    };
+
+    GModel.prototype.error = function(key, message){
+        this.errors.push({key:key, message:message});
+    };
+
+    return GModel;
 }));
