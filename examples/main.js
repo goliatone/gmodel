@@ -8,6 +8,12 @@ requirejs.config({
 
 define(['gmodel'], function (Gmodel) {
     console.log('Loading');
-	var gmodel = new Gmodel();
-	gmodel.init();
+    var config = {data:{name:'goliatone', age:32}};
+	var gmodel = new Gmodel(config);
+
+	gmodel.format('name', function(name){ return name+'!'; });
+	
+	console.log(gmodel.get('name'));
+
+	window.gmodel = gmodel;
 });
