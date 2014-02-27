@@ -32,7 +32,7 @@
             return mod;
         };
     }
-}(this, 'GModel', function() {
+}(this, 'GModel', ['gpub'], function(Gpub) {
 
     /**
      * Extend method.
@@ -119,7 +119,7 @@
     };
 
     GModel.prototype.get = function(key, def){
-        var value = this.attributes[key] || def,
+        var value     = this.attributes[key] || def,
             formatter = this.formatters[key];
         if(!formatter) return value;
         //TODO: Should we enable multiple formatters?
@@ -127,8 +127,16 @@
     };
 
     GModel.prototype.set = function(key, value){
+        var old = this.attributes[key];
+        
+        if(old === value) return this;
+
         this.attributes[key] = value;
         this.dirty[key] = value; //TODO: We can remove this...it should be sync.
+        
+        var event = {old:old, value:value, property:key};
+        if(this.emits('change')) this.emit('change', event);
+        if(this.emits('change:' + key)) this.emit('change:' + key, event);
 
         return this;
     };
@@ -144,8 +152,14 @@
 
     GModel.prototype.del = function(key){
         if(! this.has(key)) return this;
+        var old = this.attributes[key],
+            event = {old:old, property:key};
         delete this.attributes[key];
         delete this.dirty[key];
+
+        if(this.emits('delete')) this.emit('delete', event);
+        if(this.emits('delete:'+key)) this.emit('delete:'+key, event);
+
         return this;
     };
 
@@ -189,8 +203,16 @@
     };
 
     //TODO: Handle virtual attributes.
-    GModel.prototype.compute = function(key, set, get){
+    GModel.prototype.compute = function(key, callback, set, get){
+        var str = callback.toString();
+        var attrs = str.match(/this.[a-zA-Z0-9]*/g);
 
+        this.set(name, callback.call(this.data)); //TODO: refactor (may be use replace)
+        for(var l = attrs.length; l--;){
+            this.on('change ' + attrs[l].slice(5), function(){
+                this.set(name, callback.call(this.data));
+            });
+        }
     };
 
 ///////////////////////////////////////////////
@@ -201,8 +223,8 @@
         this.errors = [];
         for(var i = 0, t = fns.length; i < t; ++i) fns[i](this);
         
-        if(this.errors.length) this.emit('invalid');
-        else this.emit('valid');
+        if(this.errors.length && this.emits('invalid')) this.emit('invalid');
+        else if(this.emits('valid')) this.emit('valid');
 
         return this;
     };
@@ -218,6 +240,8 @@
     GModel.prototype.error = function(key, message){
         this.errors.push({key:key, message:message});
     };
+
+    Gpub.observable(GModel.prototype);
 
     return GModel;
 }));
