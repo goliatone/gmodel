@@ -110,7 +110,12 @@
 ///////////////////////////////////////////////////
 // PRIVATE METHODS
 ///////////////////////////////////////////////////
-
+    /**
+     * Initialization method. It resets the
+     * model instance.
+     * @param  {Object} config Options object
+     * @return {this}
+     */
     GModel.prototype.init = function(config){
         console.log('GModel: Init!');
 
@@ -122,6 +127,15 @@
         return this;
     };
 
+    /**
+     * Getter method. Access a property
+     * of the model by key.
+     * @param  {String} key Attribute key
+     * @param  {Object} def Default value if attribute
+     *                      is not defined.
+     * @return {Object}     Value for key attribute or
+     *                      default value.
+     */
     GModel.prototype.get = function(key, def){
         var value     = this.attributes[key] || def,
             formatter = this.formatters[key];
@@ -130,6 +144,17 @@
         return formatter.fn.call(formatter.scope, value);
     };
 
+    /**
+     * Setter method. Set value of property
+     * identified by key.
+     *
+     * @event change
+     * @event change:<key>
+     * 
+     * @param {String} key   Attribute key.
+     * @param {Object} value Value object.
+     * @return {this}
+     */
     GModel.prototype.set = function(key, value){
         var old = this.attributes[key];
         
@@ -146,15 +171,35 @@
         return this;
     };
 
-    GModel.prototype.alias = function(key, formatter){
+    /**
+     * Set alias for attribute.
+     * @param  {String} key       Attribute key.
+     * @param  {String} alias     New name for attribute.
+     * @return {this}
+     */
+    GModel.prototype.alias = function(key, alias){
 
         return this;
     };
 
+    /**
+     * Check if attribute with key name
+     * is registered.
+     * @param  {String}  key Attribute key.
+     * @return {Boolean}     True if hasOwnProperty key.
+     */
     GModel.prototype.has = function(key){
         return this.attributes.hasOwnProperty(key);
     };
 
+    /**
+     * Delete attribute value.
+     * @event delete
+     * @event delete:<key>
+     * 
+     * @param  {String} key Attribute key.
+     * @return {this}
+     */
     GModel.prototype.del = function(key){
         if(! this.has(key)) return this;
         var old = this.attributes[key],
@@ -168,24 +213,49 @@
         return this;
     };
 
+    /**
+     * Returns an object with attributes.
+     * @return {Object} Attributes values.
+     */
     GModel.prototype.toJSON = function(){
         return _extend({}, this.attributes);
     };
 
-    GModel.prototype.fromJSON = function(data){
-        this.init(data);
+    /**
+     * Initialize model from JSON.
+     * @param  {Object} data Initializer
+     * @return {this}
+     */
+    GModel.prototype.fromJSON = function(data, options){
+        this.init({data:data, options:options||{}});
         return this;
     };
 
-    GModel.prototype.changed = function(attributes){
-        if(typeof attributes === 'string') return !! this.dirty[attributes];
+    /**
+     * Returns dirty attributes. Optionally, if we 
+     * want to check for an specific attribute we can pass
+     * the attribute name.
+     * @param  {String} attribute Attributes that have been
+     *                             modified.
+     * @return {Boolean|Object}
+     */
+    GModel.prototype.changed = function(attribute){
+        if(typeof attribute === 'string') return !! this.dirty[attribute];
 
         var ouput = {};
-        for(var attribute in this.dirty) ouput[attribute] = this.dirty[attribute];
+        for(attribute in this.dirty) ouput[attribute] = this.dirty[attribute];
 
         return ouput;
     };
 
+    /**
+     * Walks over all attributes and applies callback.
+     * Optionally we can pass the scope.
+     * @param  {Function} callback Method to apply to each
+     *                             item.
+     * @param  {Object}   scope
+     * @return {this}
+     */
     GModel.prototype.walk = function(callback, scope) {
         scope || (scope = this);
 
@@ -196,12 +266,26 @@
         return this;
     };
 
-
+    /**
+     * Add formatter for a given key.
+     * @param  {String}   id       Attribute key
+     * @param  {Function} callback Function to apply before
+     *                             getter.
+     * @param  {Object}   scope
+     * @return {this}
+     */
     GModel.prototype.format = function(id, callback, scope) {
         this.formatters[id] = {fn:callback, scope:(scope || this)};
         return this;
     };
 
+    /**
+     * Enables plugin.
+     * @param  {Function} plugin   Plugin to extend
+     * @param  {String} scenario String that identifies
+     *                           when it should be applied.
+     * @return {this}
+     */
     GModel.prototype.use = function(plugin, scenario){
         plugin(this, scenario);
         return this;
@@ -222,7 +306,12 @@
 
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
-
+    
+    /**
+     * Validation function.
+     * TODO: Move to plugin.
+     * @return {this}
+     */
     GModel.prototype.validate = function(){
         var fns = this.validators || [];
         this.errors = [];
@@ -234,7 +323,11 @@
         return this;
     };
 
-    //TODO: Move to plugin?
+    /**
+     * TODO: Move to plugin
+     * @param  {Function} validator Validator function.
+     * @return {this}
+     */
     GModel.prototype.validator = function(validator){
         this.validators || (this.validators = []);
 
@@ -242,8 +335,15 @@
         return this;
     };
 
+    /**
+     * Set validation error.
+     * @param  {String} key     Attribute key.
+     * @param  {String} message Error message.
+     * @return {this}
+     */
     GModel.prototype.error = function(key, message){
         this.errors.push({key:key, message:message});
+        return this;
     };
 
     Gpub.observable(GModel.prototype);
