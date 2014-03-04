@@ -102,7 +102,7 @@
 
         this.formatters = [];
         console.log(config);
-        this.init(config.data);
+        this.init(config);
     };
 
 
@@ -111,11 +111,15 @@
 // PRIVATE METHODS
 ///////////////////////////////////////////////////
 
-    GModel.prototype.init = function(data){
+    GModel.prototype.init = function(config){
         console.log('GModel: Init!');
-        this.attributes = data || {};
+
         this.dirty = {};
-        return 'This is just a stub!';
+
+        this.attributes = config.data || {};
+        this.aliases = config.aliases || {};
+        
+        return this;
     };
 
     GModel.prototype.get = function(key, def){
@@ -134,6 +138,7 @@
         this.attributes[key] = value;
         this.dirty[key] = value; //TODO: We can remove this...it should be sync.
         
+        //TODO: We should throttle this. Make nextTick?
         var event = {old:old, value:value, property:key};
         if(this.emits('change')) this.emit('change', event);
         if(this.emits('change:' + key)) this.emit('change:' + key, event);
