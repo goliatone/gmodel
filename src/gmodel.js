@@ -120,7 +120,7 @@
         console.log('GModel: Init!');
 
         this.dirty = {};
-
+        //TODO: Rename attributes to properties.
         this.attributes = config.data || {};
         this.aliases = config.aliases || {};
         
@@ -130,6 +130,10 @@
     /**
      * Getter method. Access a property
      * of the model by key.
+     *
+     * TODO: We could implement an onGet callback
+     *       so we can use plugins?
+     * 
      * @param  {String} key Attribute key
      * @param  {Object} def Default value if attribute
      *                      is not defined.
@@ -148,6 +152,9 @@
      * Setter method. Set value of property
      * identified by key.
      *
+     * TODO: We could implement an onSet callback
+     *       so we can use plugins?
+     * 
      * @event change
      * @event change:<key>
      * 
@@ -196,7 +203,10 @@
      * Delete attribute value.
      * @event delete
      * @event delete:<key>
-     * 
+     *
+     * TODO: We could implement an onDel callback
+     *       so we can use plugins?
+     *
      * @param  {String} key Attribute key.
      * @return {this}
      */
