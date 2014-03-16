@@ -1,4 +1,4 @@
-/*global define:true, describe:true , it:true , expect:true, 
+/*global define:true, describe:true , it:true , expect:true,
 beforeEach:true, sinon:true, spyOn:true , expect:true */
 /* jshint strict: false */
 define(['gmodel'], function(Gmodel) {
@@ -14,10 +14,10 @@ define(['gmodel'], function(Gmodel) {
         it('Gmodel should initialize', function() {
             var gmodel = new Gmodel();
             var output   = gmodel.init();
-            var expected = 'This is just a stub!';
+            var expected = gmodel;
             expect(output).toEqual(expected);
         });
-        
+
     });
 
 });

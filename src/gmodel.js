@@ -14,7 +14,7 @@
         factory = deps;
         deps = [];
     }
-        
+
     if (typeof exports === 'object') {
         module.exports = factory.apply(root, deps.map(require));
     } else if (typeof define === 'function' && 'amd' in define) {
@@ -50,7 +50,7 @@
                     if (d.get) {
                         target.__defineGetter__(k, d.get);
                         if (d.set) target.__defineSetter__(k, d.set);
-                    } else if (target !== d.value) target[k] = d.value;                
+                    } else if (target !== d.value) target[k] = d.value;
                 });
             }
         }
@@ -85,16 +85,16 @@
 ///////////////////////////////////////////////////
 // CONSTRUCTOR
 ///////////////////////////////////////////////////
-	
+
 	var options = {
-        
+
     };
-    
+
     /**
      * GModel constructor
      * TODO: Handle default values for model props.
      * TODO: Schema?
-     * 
+     *
      * @param  {object} config Configuration object.
      */
     var GModel = function(config){
@@ -117,13 +117,14 @@
      * @return {this}
      */
     GModel.prototype.init = function(config){
+        config || (config = {});
         console.log('GModel: Init!');
 
         this.dirty = {};
         //TODO: Rename attributes to properties.
         this.attributes = config.data || {};
         this.aliases = config.aliases || {};
-        
+
         return this;
     };
 
@@ -133,7 +134,7 @@
      *
      * TODO: We could implement an onGet callback
      *       so we can use plugins?
-     * 
+     *
      * @param  {String} key Attribute key
      * @param  {Object} def Default value if attribute
      *                      is not defined.
@@ -154,22 +155,22 @@
      *
      * TODO: We could implement an onSet callback
      *       so we can use plugins?
-     * 
+     *
      * @event change
      * @event change:<key>
-     * 
+     *
      * @param {String} key   Attribute key.
      * @param {Object} value Value object.
      * @return {this}
      */
     GModel.prototype.set = function(key, value){
         var old = this.attributes[key];
-        
+
         if(old === value) return this;
 
         this.attributes[key] = value;
         this.dirty[key] = value; //TODO: We can remove this...it should be sync.
-        
+
         //TODO: We should throttle this. Make nextTick?
         var event = {old:old, value:value, property:key};
         if(this.emits('change')) this.emit('change', event);
@@ -242,7 +243,7 @@
     };
 
     /**
-     * Returns dirty attributes. Optionally, if we 
+     * Returns dirty attributes. Optionally, if we
      * want to check for an specific attribute we can pass
      * the attribute name.
      * @param  {String} attribute Attributes that have been
@@ -316,7 +317,7 @@
 
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
-    
+
     /**
      * Validation function.
      * TODO: Move to plugin.
@@ -326,7 +327,7 @@
         var fns = this.validators || [];
         this.errors = [];
         for(var i = 0, t = fns.length; i < t; ++i) fns[i](this);
-        
+
         if(this.errors.length && this.emits('invalid')) this.emit('invalid');
         else if(this.emits('valid')) this.emit('valid');
 
