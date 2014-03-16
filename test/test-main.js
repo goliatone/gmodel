@@ -6,6 +6,9 @@ requirejs.config({
     // Karma serves files from '/base'
     baseUrl: '/base/src',
 
+    paths: {
+        'gpub': '../lib/gpub/src/gpub'
+    },
     // ask Require.js to load these files (all our tests)
     deps: tests,
 
