@@ -13,6 +13,7 @@ files = [
     REQUIRE,
     REQUIRE_ADAPTER,
 
+    {pattern: 'lib/gpub/src/gpub.js', included: false},
     {pattern: 'lib/requirejs/require.js', included: false},
     {pattern: 'src/*.js', included: false},
     {pattern: 'test/spec/*-spec.js', included: false},
